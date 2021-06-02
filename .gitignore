@@ -1,0 +1,6 @@
+client/client
+client/client.exe
+
+server/server
+server/server.exe
+server/database/user.db
