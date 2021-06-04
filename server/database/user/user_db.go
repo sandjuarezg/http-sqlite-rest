@@ -1,8 +1,9 @@
 package user
 
 import (
-	"bytes"
 	"database/sql"
+	"encoding/json"
+	"log"
 
 	_ "github.com/mattn/go-sqlite3"
 )
@@ -18,23 +19,21 @@ type users struct {
 }
 
 func AddUser(db *sql.DB, body []byte) (err error) {
+	var users users
 	smt, err := db.Prepare("INSERT INTO users (name, password) VALUES (?, ?)")
 	if err != nil {
 		return
 	}
 	defer smt.Close()
 
-	var element [][]byte = bytes.Split(body, []byte{'\n'})
+	err = json.Unmarshal(body, &users)
+	if err != nil {
+		log.Fatal(err)
+	}
 
-	if len(element) == 3 {
-		var user user = user{}
-		user.Name = string(element[0])
-		user.Pass = string(element[1])
-
-		_, err = smt.Exec(user.Name, user.Pass)
-		if err != nil {
-			return
-		}
+	_, err = smt.Exec(users.UsersArray[0].Name, users.UsersArray[0].Pass)
+	if err != nil {
+		return
 	}
 
 	return

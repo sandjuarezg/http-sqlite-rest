@@ -41,22 +41,30 @@ func main() {
 		case "1":
 
 			reply = make([]byte, 1024)
-			var data []byte
+			var users users
+			var user user
+
 			fmt.Println("Enter a name")
-			n, err := rStdin.Read(reply)
+			reply, _, err := rStdin.ReadLine()
 			if err != nil {
 				log.Fatal(err)
 			}
-			data = append(data, reply[:n]...)
+			user.Name = string(reply)
 
 			fmt.Println("Enter a password")
-			n, err = rStdin.Read(reply)
+			reply, _, err = rStdin.ReadLine()
 			if err != nil {
 				log.Fatal(err)
 			}
-			data = append(data, reply[:n]...)
+			user.Pass = string(reply)
 
-			response, body := createNewRequest("POST", "http://localhost:8080/add", bytes.NewReader(data))
+			users.UsersArray = append(users.UsersArray, user)
+			usersB, err := json.Marshal(users)
+			if err != nil {
+				log.Fatal(err)
+			}
+
+			response, body := createNewRequest("POST", "http://localhost:8080/add", bytes.NewReader(usersB))
 			var status int = response.StatusCode
 			if status != 200 {
 				log.Fatal(response.Status)
