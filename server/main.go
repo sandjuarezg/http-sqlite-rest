@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"log"
 	"net/http"
 
@@ -40,16 +39,11 @@ func postAdd(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	body, err := ioutil.ReadAll(r.Body)
+	var addU function.User
+	err = json.NewDecoder(r.Body).Decode(&addU)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		return
-	}
-
-	var addU function.User
-	err = json.Unmarshal(body, &addU)
-	if err != nil {
-		log.Fatal(err)
 	}
 
 	err = user.AddUser(db, addU)
@@ -73,5 +67,9 @@ func getShow(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	json.NewEncoder(w).Encode(users)
+	err = json.NewEncoder(w).Encode(users)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
 }

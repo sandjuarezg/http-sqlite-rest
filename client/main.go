@@ -61,6 +61,7 @@ func main() {
 			}
 
 			response, body := createNewRequest("POST", "http://localhost:8080/add", bytes.NewReader(usersB))
+
 			var status int = response.StatusCode
 			if status != 200 {
 				log.Fatal(response.Status)
@@ -71,6 +72,7 @@ func main() {
 		case "2":
 
 			response, body := createNewRequest("GET", "http://localhost:8080/show", nil)
+
 			var status int = response.StatusCode
 			if status != 200 {
 				log.Fatal(response.Status)
