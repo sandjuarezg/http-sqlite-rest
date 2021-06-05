@@ -22,7 +22,7 @@ func AddUser(db *sql.DB, user function.User) (err error) {
 	return
 }
 
-func ShowUser(db *sql.DB) (users function.Users, err error) {
+func ShowUser(db *sql.DB) (users []function.User, err error) {
 	rows, err := db.Query("SELECT id, name, password FROM users")
 	if err != nil {
 		return

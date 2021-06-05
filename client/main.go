@@ -18,7 +18,9 @@ type user struct {
 	Pass string `json:"pass"`
 }
 
-type users []user
+type message struct {
+	Text string `json:"text"`
+}
 
 var client *http.Client = &http.Client{}
 
@@ -67,7 +69,10 @@ func main() {
 				log.Fatal(response.Status)
 			}
 			defer response.Body.Close()
-			fmt.Printf("%s\n", body)
+
+			var mess message
+			json.Unmarshal(body, &mess)
+			fmt.Printf("%s\n\n", mess.Text)
 
 		case "2":
 
@@ -79,7 +84,7 @@ func main() {
 			}
 			defer response.Body.Close()
 
-			var users users
+			var users []user
 			json.Unmarshal(body, &users)
 			fmt.Printf("|%-7s|%-15s|%-15s|\n", "id", "Name", "Password")
 			fmt.Println("_________________________________________")

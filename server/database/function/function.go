@@ -13,8 +13,6 @@ type User struct {
 	Pass string `json:"pass"`
 }
 
-type Users []User
-
 func SqlMigration() {
 	//Check migration.sql
 	var _, err = os.Stat("./database/migration.sql")
