@@ -18,9 +18,7 @@ type user struct {
 	Pass string `json:"pass"`
 }
 
-type users struct {
-	UsersArray []user `json:"users"`
-}
+type users []user
 
 var client *http.Client = &http.Client{}
 
@@ -41,7 +39,6 @@ func main() {
 		case "1":
 
 			reply = make([]byte, 1024)
-			var users users
 			var user user
 
 			fmt.Println("Enter a name")
@@ -58,8 +55,7 @@ func main() {
 			}
 			user.Pass = string(reply)
 
-			users.UsersArray = append(users.UsersArray, user)
-			usersB, err := json.Marshal(users)
+			usersB, err := json.Marshal(user)
 			if err != nil {
 				log.Fatal(err)
 			}
@@ -76,17 +72,17 @@ func main() {
 
 			response, body := createNewRequest("GET", "http://localhost:8080/show", nil)
 			var status int = response.StatusCode
-			var users users
 			if status != 200 {
 				log.Fatal(response.Status)
 			}
 			defer response.Body.Close()
 
+			var users users
 			json.Unmarshal(body, &users)
 			fmt.Printf("|%-7s|%-15s|%-15s|\n", "id", "Name", "Password")
 			fmt.Println("_________________________________________")
-			for i := 0; i < len(users.UsersArray); i++ {
-				fmt.Printf("|%-7d|%-15s|%-15s|\n", users.UsersArray[i].Id, users.UsersArray[i].Name, users.UsersArray[i].Pass)
+			for i := 0; i < len(users); i++ {
+				fmt.Printf("|%-7d|%-15s|%-15s|\n", users[i].Id, users[i].Name, users[i].Pass)
 			}
 			fmt.Println()
 

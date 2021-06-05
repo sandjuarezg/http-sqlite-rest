@@ -46,7 +46,13 @@ func postAdd(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = user.AddUser(db, body)
+	var addU function.User
+	err = json.Unmarshal(body, &addU)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	err = user.AddUser(db, addU)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		return

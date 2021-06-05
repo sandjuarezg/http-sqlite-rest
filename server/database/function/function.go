@@ -7,6 +7,14 @@ import (
 	"os"
 )
 
+type User struct {
+	Id   int    `json:"id"`
+	Name string `json:"name"`
+	Pass string `json:"pass"`
+}
+
+type Users []User
+
 func SqlMigration() {
 	//Check migration.sql
 	var _, err = os.Stat("./database/migration.sql")
