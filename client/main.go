@@ -5,8 +5,6 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"io"
-	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
@@ -18,30 +16,24 @@ type user struct {
 	Pass string `json:"pass"`
 }
 
-type message struct {
-	Text string `json:"text"`
-}
-
-var client *http.Client = &http.Client{}
-
 func main() {
 	for {
-		var reply []byte = make([]byte, 1024)
+		var res string
 		var rStdin *bufio.Reader = bufio.NewReader(os.Stdin)
 
 		fmt.Println("1. Add user")
 		fmt.Println("2. Show users")
 		fmt.Println("3. Exit")
-		reply, _, err := rStdin.ReadLine()
+		_, err := fmt.Scanln(&res)
 		if err != nil {
 			log.Fatal(err)
 		}
 
-		switch string(reply) {
+		switch string(res) {
 		case "1":
 
-			reply = make([]byte, 1024)
 			var user user
+			var res map[string]interface{}
 
 			fmt.Println("Enter a name")
 			reply, _, err := rStdin.ReadLine()
@@ -57,35 +49,48 @@ func main() {
 			}
 			user.Pass = string(reply)
 
-			usersB, err := json.Marshal(user)
+			var data map[string]string = map[string]string{
+				"name": user.Name,
+				"pass": user.Pass,
+			}
+			dataJSON, err := json.Marshal(data)
 			if err != nil {
 				log.Fatal(err)
 			}
 
-			response, body := createNewRequest("POST", "http://localhost:8080/add", bytes.NewReader(usersB))
-
-			var status int = response.StatusCode
-			if status != 200 {
+			response, err := http.Post("http://localhost:8080/add", "application/json", bytes.NewBuffer(dataJSON))
+			if response.StatusCode != 200 {
 				log.Fatal(response.Status)
+			}
+			if err != nil {
+				log.Fatal(err)
 			}
 			defer response.Body.Close()
 
-			var mess message
-			json.Unmarshal(body, &mess)
-			fmt.Printf("%s\n\n", mess.Text)
+			err = json.NewDecoder(response.Body).Decode(&res)
+			if err != nil {
+				log.Fatal(err)
+			}
+
+			fmt.Println(res["text"])
 
 		case "2":
 
-			response, body := createNewRequest("GET", "http://localhost:8080/show", nil)
-
-			var status int = response.StatusCode
-			if status != 200 {
+			var users []user
+			response, err := http.Get("http://localhost:8080/show")
+			if response.StatusCode != 200 {
 				log.Fatal(response.Status)
+			}
+			if err != nil {
+				log.Fatal(err)
 			}
 			defer response.Body.Close()
 
-			var users []user
-			json.Unmarshal(body, &users)
+			err = json.NewDecoder(response.Body).Decode(&users)
+			if err != nil {
+				log.Fatal(err)
+			}
+
 			fmt.Printf("|%-7s|%-15s|%-15s|\n", "id", "Name", "Password")
 			fmt.Println("_________________________________________")
 			for i := 0; i < len(users); i++ {
@@ -98,29 +103,6 @@ func main() {
 			fmt.Println("E X I T I N G . . .")
 			os.Exit(0)
 
-		default:
-
-			fmt.Println("404 page not found")
-
 		}
 	}
-}
-
-func createNewRequest(method string, url string, content io.Reader) (response *http.Response, body []byte) {
-	request, err := http.NewRequest(method, url, content)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	response, err = client.Do(request)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	body, err = ioutil.ReadAll(response.Body)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	return
 }

@@ -15,10 +15,6 @@ import (
 var db *sql.DB
 var err error
 
-type message struct {
-	Text string `json:"text"`
-}
-
 func main() {
 	function.SqlMigration()
 
@@ -55,7 +51,10 @@ func postAdd(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var mess message = message{Text: "Insert data successfully"}
+	var mess map[string]string = map[string]string{
+		"text": "Insert data successfully",
+	}
+
 	err = json.NewEncoder(w).Encode(mess)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
