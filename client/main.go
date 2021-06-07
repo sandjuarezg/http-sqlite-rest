@@ -18,18 +18,17 @@ type user struct {
 
 func main() {
 	for {
-		var res string
 		var rStdin *bufio.Reader = bufio.NewReader(os.Stdin)
 
 		fmt.Println("1. Add user")
 		fmt.Println("2. Show users")
 		fmt.Println("3. Exit")
-		_, err := fmt.Scanln(&res)
+		reply, _, err := rStdin.ReadLine()
 		if err != nil {
 			log.Fatal(err)
 		}
 
-		switch string(res) {
+		switch string(reply) {
 		case "1":
 
 			var user user
