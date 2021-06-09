@@ -32,7 +32,6 @@ func main() {
 		case "1":
 
 			var user user
-			var res map[string]interface{}
 
 			fmt.Println("Enter a name")
 			reply, _, err := rStdin.ReadLine()
@@ -48,11 +47,7 @@ func main() {
 			}
 			user.Pass = string(reply)
 
-			var data map[string]string = map[string]string{
-				"name": user.Name,
-				"pass": user.Pass,
-			}
-			dataJSON, err := json.Marshal(data)
+			dataJSON, err := json.Marshal(user)
 			if err != nil {
 				log.Fatal(err)
 			}
@@ -66,12 +61,13 @@ func main() {
 			}
 			defer response.Body.Close()
 
-			err = json.NewDecoder(response.Body).Decode(&res)
+			var data interface{}
+			err = json.NewDecoder(response.Body).Decode(&data)
 			if err != nil {
 				log.Fatal(err)
 			}
 
-			fmt.Println(res["text"])
+			fmt.Println(data)
 
 		case "2":
 

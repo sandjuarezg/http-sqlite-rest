@@ -51,11 +51,7 @@ func postAdd(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var mess map[string]string = map[string]string{
-		"text": "Insert data successfully",
-	}
-
-	err = json.NewEncoder(w).Encode(mess)
+	err = json.NewEncoder(w).Encode("Insert data successfully")
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		return
