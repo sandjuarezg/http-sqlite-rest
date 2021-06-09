@@ -61,13 +61,15 @@ func main() {
 			}
 			defer response.Body.Close()
 
-			var data interface{}
-			err = json.NewDecoder(response.Body).Decode(&data)
-			if err != nil {
-				log.Fatal(err)
-			}
+			if response.Header.Get("Content-Type") == "application/json" {
+				var data interface{}
+				err = json.NewDecoder(response.Body).Decode(&data)
+				if err != nil {
+					log.Fatal(err)
+				}
 
-			fmt.Println(data)
+				fmt.Println(data)
+			}
 
 		case "2":
 
