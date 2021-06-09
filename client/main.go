@@ -61,13 +61,15 @@ func main() {
 			}
 			defer response.Body.Close()
 
-			var data interface{}
-			err = json.NewDecoder(response.Body).Decode(&data)
-			if err != nil {
-				log.Fatal(err)
-			}
+			if response.Header.Get("Content-Type") == "application/json" {
+				var data interface{}
+				err = json.NewDecoder(response.Body).Decode(&data)
+				if err != nil {
+					log.Fatal(err)
+				}
 
-			fmt.Println(data)
+				fmt.Println(data)
+			}
 
 		case "2":
 
@@ -81,17 +83,19 @@ func main() {
 			}
 			defer response.Body.Close()
 
-			err = json.NewDecoder(response.Body).Decode(&users)
-			if err != nil {
-				log.Fatal(err)
-			}
+			if response.Header.Get("Content-Type") == "application/json" {
+				err = json.NewDecoder(response.Body).Decode(&users)
+				if err != nil {
+					log.Fatal(err)
+				}
 
-			fmt.Printf("|%-7s|%-15s|%-15s|\n", "id", "Name", "Password")
-			fmt.Println("_________________________________________")
-			for i := 0; i < len(users); i++ {
-				fmt.Printf("|%-7d|%-15s|%-15s|\n", users[i].Id, users[i].Name, users[i].Pass)
+				fmt.Printf("|%-7s|%-15s|%-15s|\n", "id", "Name", "Password")
+				fmt.Println("_________________________________________")
+				for i := 0; i < len(users); i++ {
+					fmt.Printf("|%-7d|%-15s|%-15s|\n", users[i].Id, users[i].Name, users[i].Pass)
+				}
+				fmt.Println()
 			}
-			fmt.Println()
 
 		case "3":
 
