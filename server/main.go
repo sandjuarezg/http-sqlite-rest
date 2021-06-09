@@ -38,7 +38,7 @@ func postAdd(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	w.Header().Set("Content-Type", "application/json")
+	w.Header().Set("Content-Type", r.Header.Get("Content-Type"))
 
 	var addU function.User
 	err = json.NewDecoder(r.Body).Decode(&addU)
@@ -58,6 +58,7 @@ func postAdd(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
+
 }
 
 func getShow(w http.ResponseWriter, r *http.Request) {
@@ -65,8 +66,6 @@ func getShow(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
-
-	w.Header().Set("Content-Type", "application/json")
 
 	users, err := user.ShowUser(db)
 	if err != nil {
