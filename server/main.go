@@ -38,27 +38,28 @@ func postAdd(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	w.Header().Set("Content-Type", "application/json")
+	if r.Header.Get("Accept") == "application/json" {
+		w.Header().Set("Content-Type", "application/json")
 
-	var addU function.User
-	err = json.NewDecoder(r.Body).Decode(&addU)
-	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		return
+		var addU function.User
+		err = json.NewDecoder(r.Body).Decode(&addU)
+		if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+
+		err = user.AddUser(db, addU)
+		if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+
+		err = json.NewEncoder(w).Encode("Insert data successfully")
+		if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+		}
 	}
-
-	err = user.AddUser(db, addU)
-	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		return
-	}
-
-	err = json.NewEncoder(w).Encode("Insert data successfully")
-	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		return
-	}
-
 }
 
 func getShow(w http.ResponseWriter, r *http.Request) {
@@ -67,18 +68,20 @@ func getShow(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	w.Header().Set("Content-Type", "application/json")
+	if r.Header.Get("Accept") == "application/json" {
+		w.Header().Set("Content-Type", "text/html")
 
-	users, err := user.ShowUser(db)
-	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		return
-	}
+		users, err := user.ShowUser(db)
+		if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+		}
 
-	err = json.NewEncoder(w).Encode(users)
-	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		return
+		err = json.NewEncoder(w).Encode(users)
+		if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+		}
 	}
 
 }

@@ -16,6 +16,8 @@ type user struct {
 	Pass string `json:"pass"`
 }
 
+var client *http.Client = &http.Client{}
+
 func main() {
 	for {
 		var rStdin *bufio.Reader = bufio.NewReader(os.Stdin)
@@ -52,7 +54,14 @@ func main() {
 				log.Fatal(err)
 			}
 
-			response, err := http.Post("http://localhost:8080/add", "application/json", bytes.NewBuffer(dataJSON))
+			request, err := http.NewRequest("POST", "http://localhost:8080/add", bytes.NewBuffer(dataJSON))
+			if err != nil {
+				log.Fatal(err)
+			}
+
+			request.Header.Set("Accept", "application/json")
+
+			response, err := client.Do(request)
 			if response.StatusCode != 200 {
 				log.Fatal(response.Status)
 			}
@@ -61,20 +70,26 @@ func main() {
 			}
 			defer response.Body.Close()
 
-			if response.Header.Get("Content-Type") == "application/json" {
-				var data interface{}
-				err = json.NewDecoder(response.Body).Decode(&data)
-				if err != nil {
-					log.Fatal(err)
-				}
-
-				fmt.Println(data)
+			var data interface{}
+			err = json.NewDecoder(response.Body).Decode(&data)
+			if err != nil {
+				log.Fatal(err)
 			}
+
+			fmt.Println(data)
 
 		case "2":
 
 			var users []user
-			response, err := http.Get("http://localhost:8080/show")
+
+			request, err := http.NewRequest("GET", "http://localhost:8080/show", nil)
+			if err != nil {
+				log.Fatal(err)
+			}
+
+			request.Header.Set("Accept", "application/json")
+
+			response, err := client.Do(request)
 			if response.StatusCode != 200 {
 				log.Fatal(response.Status)
 			}
@@ -83,19 +98,17 @@ func main() {
 			}
 			defer response.Body.Close()
 
-			if response.Header.Get("Content-Type") == "application/json" {
-				err = json.NewDecoder(response.Body).Decode(&users)
-				if err != nil {
-					log.Fatal(err)
-				}
-
-				fmt.Printf("|%-7s|%-15s|%-15s|\n", "id", "Name", "Password")
-				fmt.Println("_________________________________________")
-				for i := 0; i < len(users); i++ {
-					fmt.Printf("|%-7d|%-15s|%-15s|\n", users[i].Id, users[i].Name, users[i].Pass)
-				}
-				fmt.Println()
+			err = json.NewDecoder(response.Body).Decode(&users)
+			if err != nil {
+				log.Fatal(err)
 			}
+
+			fmt.Printf("|%-7s|%-15s|%-15s|\n", "id", "Name", "Password")
+			fmt.Println("_________________________________________")
+			for i := 0; i < len(users); i++ {
+				fmt.Printf("|%-7d|%-15s|%-15s|\n", users[i].Id, users[i].Name, users[i].Pass)
+			}
+			fmt.Println()
 
 		case "3":
 
