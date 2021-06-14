@@ -16,6 +16,10 @@ type user struct {
 	Pass string `json:"pass"`
 }
 
+type message struct {
+	Body string `json:"body"`
+}
+
 var client *http.Client = &http.Client{}
 
 func main() {
@@ -70,13 +74,13 @@ func main() {
 			}
 			defer response.Body.Close()
 
-			var data map[string]string
+			var data message
 			err = json.NewDecoder(response.Body).Decode(&data)
 			if err != nil {
 				log.Fatal(err)
 			}
 
-			fmt.Println(data["text"])
+			fmt.Println(data.Body)
 
 		case "2":
 
