@@ -75,7 +75,7 @@ func getShow(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if r.Header.Get("Accept") == "application/json" {
-		w.Header().Set("Content-Type", "text/html")
+		w.Header().Set("Content-Type", "application/json")
 
 		users, err := user.ShowUser(db)
 		if err != nil {
