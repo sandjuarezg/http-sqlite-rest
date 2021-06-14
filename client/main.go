@@ -70,13 +70,13 @@ func main() {
 			}
 			defer response.Body.Close()
 
-			var data interface{}
+			var data map[string]string
 			err = json.NewDecoder(response.Body).Decode(&data)
 			if err != nil {
 				log.Fatal(err)
 			}
 
-			fmt.Println(data)
+			fmt.Println(data["text"])
 
 		case "2":
 

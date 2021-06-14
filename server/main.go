@@ -34,7 +34,7 @@ func main() {
 
 func postAdd(w http.ResponseWriter, r *http.Request) {
 	if r.Method != "POST" {
-		w.WriteHeader(http.StatusInternalServerError)
+		w.WriteHeader(http.StatusMethodNotAllowed)
 		return
 	}
 
@@ -54,17 +54,23 @@ func postAdd(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		err = json.NewEncoder(w).Encode("Insert data successfully")
+		var mess map[string]string = map[string]string{
+			"text": "Insert data successfully",
+		}
+
+		err = json.NewEncoder(w).Encode(mess)
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			return
 		}
+	} else {
+		w.WriteHeader(http.StatusNotAcceptable)
 	}
 }
 
 func getShow(w http.ResponseWriter, r *http.Request) {
 	if r.Method != "GET" {
-		w.WriteHeader(http.StatusInternalServerError)
+		w.WriteHeader(http.StatusMethodNotAllowed)
 		return
 	}
 
@@ -82,6 +88,8 @@ func getShow(w http.ResponseWriter, r *http.Request) {
 			w.WriteHeader(http.StatusInternalServerError)
 			return
 		}
+	} else {
+		w.WriteHeader(http.StatusNotAcceptable)
 	}
 
 }
